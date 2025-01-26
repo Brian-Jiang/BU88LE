@@ -19,6 +19,78 @@ namespace Graphics
         private static readonly int BubbleCountProp = Shader.PropertyToID("_BubbleCount");
         
         public const int MAX_BUBBLE_COUNT = 64;
+        
+        public void ClearAllBubbles()
+        {
+            bubbleCount = 0;
+        }
+        
+        public int AddBubble(Vector3 position, float size, float rotationSpeed)
+        {
+            if (bubbleCount >= MAX_BUBBLE_COUNT)
+            {
+                Debug.LogWarning("Bubble count exceeded maximum limit");
+                return -1;
+            }
+            
+            bubblePositions[bubbleCount] = new Vector4(position.x, position.y, position.z, 0);
+            bubbleSizes[bubbleCount] = size;
+            bubbleRotationSpeeds[bubbleCount] = rotationSpeed;
+            bubbleCount++;
+            
+            return bubbleCount - 1;
+        }
+        
+        public void SetBubblePosition(int index, Vector3 position)
+        {
+            if (index < 0 || index >= bubbleCount)
+            {
+                Debug.LogWarning("Invalid bubble index");
+                return;
+            }
+            
+            bubblePositions[index] = new Vector4(position.x, position.y, position.z, 0);
+        }
+        
+        public void SetBubbleSize(int index, float size)
+        {
+            if (index < 0 || index >= bubbleCount)
+            {
+                Debug.LogWarning("Invalid bubble index");
+                return;
+            }
+            
+            bubbleSizes[index] = size;
+        }
+        
+        public void SetBubbleRotationSpeed(int index, float rotationSpeed)
+        {
+            if (index < 0 || index >= bubbleCount)
+            {
+                Debug.LogWarning("Invalid bubble index");
+                return;
+            }
+            
+            bubbleRotationSpeeds[index] = rotationSpeed;
+        }
+        
+        public void RemoveBubble(int index)
+        {
+            if (index < 0 || index >= bubbleCount)
+            {
+                Debug.LogWarning("Invalid bubble index");
+                return;
+            }
+            
+            for (int i = index; i < bubbleCount - 1; i++)
+            {
+                bubblePositions[i] = bubblePositions[i + 1];
+                bubbleSizes[i] = bubbleSizes[i + 1];
+                bubbleRotationSpeeds[i] = bubbleRotationSpeeds[i + 1];
+            }
+            
+            bubbleCount--;
+        }
 
         private void Start()
         {
