@@ -34,6 +34,7 @@
             int _BubbleCount;
             float _BubbleSizes[MAX_SHAPES];
             float4 _BubblePositions[MAX_SHAPES];
+            float _BubbleRotationSpeeds[MAX_SHAPES];
 
             struct appdata
             {
@@ -67,6 +68,24 @@
                 return length(p) - r;
             }
 
+            float2 RotateUV(float2 uv, float2 pivot, float angle)
+            {
+                float s = sin(angle);
+                float c = cos(angle);
+
+                // Translate UV to the origin (pivot point)
+                uv -= pivot;
+
+                // Rotate UV
+                float2 rotatedUV = float2(
+                    uv.x * c - uv.y * s,
+                    uv.x * s + uv.y * c
+                );
+
+                // Translate UV back from the origin
+                return rotatedUV + pivot;
+            }
+
             v2f vert(appdata v)
             {
                 v2f o;
@@ -88,8 +107,9 @@
 
                 float2 p = i.uv;
 
-                float2 closestBubble = float2(0, 0);
+                float2 closestBubbleCenterToPosition = float2(0, 0);
                 float closestBubbleSize = 0;
+                float closestBubbleRotationSpeed = 0;
                 float closestBubbleDist = 10000000;
                 float d = 10000000;
                 float4 finalColor = float4(0, 0, 0, 0);
@@ -107,30 +127,44 @@
                     // float aliveTime = (startTime - _Time[1]) / 20.0;
 
                     // float2 movement = (aliveTime * direction * _EnableMovement);
-                    float2 pos = (p - position.xy);
+                    float2 bubbleCenterToPosition = (p - position.xy);
                     // pos.x = ((pos.x + 1.0) % 2) - 1.0;
                     // pos.y = ((pos.y + 1.0) % 2) - 1.0;
-                    float bubbleDist = sdCircle(pos, size);
-                    // d = smin(d, bubbleDist, 0.1);
-                    d = min(d, bubbleDist);
+                    float bubbleDist = sdCircle(bubbleCenterToPosition, size);
+                    d = smin(d, bubbleDist, 0.05);
+                    // d = min(d, bubbleDist);
                     // d = smin(d, sdCircle(pos, size), 0.1);
                     if (bubbleDist < closestBubbleDist)
                     {
-                        closestBubble = pos;
+                        closestBubbleCenterToPosition = bubbleCenterToPosition;
                         closestBubbleSize = size;
                         closestBubbleDist = bubbleDist;
+                        closestBubbleRotationSpeed = _BubbleRotationSpeeds[c];
                     }
 
                     // Apply texture color for this bubble
                     // float mask = smoothstep(0.02, 0.03, bubbleDist);
-                    float mask = smoothstep(-0.01, 0.0, bubbleDist);
-                    mask = saturate(1.0 - mask);
+                    // float mask = smoothstep(-0.01, 0.0, bubbleDist);
+                    // float mask = smoothstep(-0.01, 0.01, bubbleDist);
+                    // mask = saturate(1.0 - mask);
+                    // float maskOutside = smoothstep(0.0, 0.02, bubbleDist);
+                    // maskOutside = saturate(1.0 - maskOutside);
+                    // mask = 1.0;
                     
                     // Sample the texture and add its contribution
-                    float2 uv = (pos / (2.0 * size)) + 0.5; // Map pos to [0,1] for texture sampling
-                    float4 bubbleColor = tex2D(_MainTex, uv) * _Color;
-                    finalColor += bubbleColor * mask; // Accumulate color contribution
-                    totalWeight += mask * length(bubbleColor.xyz);
+                    // float2 uv = (bubbleCenterToPosition / (2.0 * size)) + 0.5; // Map pos to [0,1] for texture sampling
+                    // float4 bubbleColor = tex2D(_MainTex, uv) * _Color;
+                    // bubbleColor.a *= mask;
+                    
+                    // finalColor += bubbleColor; // Accumulate color contribution
+                    
+                    // totalWeight += mask * length(bubbleColor.xyz);
+                    // totalWeight += 1;
+
+                    if (bubbleDist < size / 4.0)
+                    {
+                        totalWeight += 1;
+                    }
                     
                     // finalColor += float4(uv, 0, 1) * mask;
                 }
@@ -138,12 +172,33 @@
                 // Average the final color
                 if (totalWeight > 0.0)
                 {
-                    finalColor /= totalWeight;
+                    // finalColor /= totalWeight;
                 }
                 
-                // d = smoothstep(0.02, 0.03, d);
+                // d = smoothstep(0.0, 0.02, d);
                 // d = saturate(1 - d);
                 // return d * _Color;
+
+                // if (totalWeight > 2.1)
+                // {
+                //     return float4(1, 0, 0, 1);
+                // }
+
+                if (true || totalWeight > 1.0)
+                {
+                    // float mask = smoothstep(-0.01, 0.01, closestBubbleDist);
+                    float mask = smoothstep(-0.01, 0.005, d);
+                    mask = saturate(1.0 - mask);
+                    
+                    float2 closestBubbleUV = (closestBubbleCenterToPosition / (2.0 * closestBubbleSize)) + 0.5; // Map pos to [0,1] for texture sampling
+                    float rotationSpeed = closestBubbleRotationSpeed;
+                    float rotation = _Time[1] * rotationSpeed;
+                    closestBubbleUV = RotateUV(closestBubbleUV, float2(0.5, 0.5), rotation);
+                    float4 bubbleColor = tex2D(_MainTex, closestBubbleUV) * _Color;
+                    bubbleColor.a *= mask;
+                    finalColor = bubbleColor;
+                }
+                
 
                 // float2 uv = (closestBubble / (2.0 * closestBubbleSize)) + 0.5;
                 float2 distUV = float2(0.5, 1 - (-closestBubbleDist / closestBubbleSize));
@@ -155,8 +210,8 @@
 
                 float distProp = 1 - (-closestBubbleDist / closestBubbleSize);
                 // float2 distUV = float2(0.5, d);
-                float4 distTransparency = tex2D(_DistanceTex, distUV);
-                float threshold = 0.9;
+                // float4 distTransparency = tex2D(_DistanceTex, distUV);
+                float threshold = 0.6;
                 float trans = saturate((distProp - threshold) / (1 - threshold));
                 finalColor.a = min(finalColor.a, trans);
                 

@@ -9,6 +9,7 @@ namespace Graphics
         
         public Vector4[] bubblePositions;
         public float[] bubbleSizes;
+        public float[] bubbleRotationSpeeds;
         public int bubbleCount;
         
         private Material bubbleMaterialInstance;
@@ -23,6 +24,7 @@ namespace Graphics
         {
             bubblePositions = new Vector4[MAX_BUBBLE_COUNT];
             bubbleSizes = new float[MAX_BUBBLE_COUNT];
+            bubbleRotationSpeeds = new float[MAX_BUBBLE_COUNT];
             
             bubbleMaterialInstance = bubbleRenderer.material;
             
@@ -30,6 +32,8 @@ namespace Graphics
             bubblePositions[1] = new Vector4(0.58f, 0.72f, 0, 0);
             bubbleSizes[0] = 0.2f;
             bubbleSizes[1] = 0.26f;
+            bubbleRotationSpeeds[0] = 0.5f;
+            bubbleRotationSpeeds[1] = -0.3f;
             bubbleCount = 2;
         }
 
@@ -40,6 +44,7 @@ namespace Graphics
             {
                 bubbleMaterialInstance.SetVectorArray(BubblePositionsProp, bubblePositions);
                 bubbleMaterialInstance.SetFloatArray(BubbleSizesProp, bubbleSizes);
+                bubbleMaterialInstance.SetFloatArray("_BubbleRotationSpeeds", bubbleRotationSpeeds);
             }
         }
     }
