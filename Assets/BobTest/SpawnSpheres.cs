@@ -16,7 +16,7 @@ public class SpawnSpheres : MonoBehaviour
     public float MergeThreshold = 0.1f;
     public List<(Vector3 center, float radius)> BubbleList = new();
     public List<List<int>> BubbleMergeList = new();
-    private List<GameObject> bubbles = new();
+    private List<GameObject> BubbleObjects = new();
     
     void Start()
     {
@@ -27,7 +27,6 @@ public class SpawnSpheres : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        BubbleMerge();
         
         // new bubble
         if (Input.GetMouseButtonDown(0))
@@ -39,6 +38,7 @@ public class SpawnSpheres : MonoBehaviour
             {
                 GameObject newCircle = Instantiate(Bubble, mousePos, quaternion.identity);
                 newCircle.transform.localScale = Vector3.one * (MinRadius * 2);
+                BubbleObjects.Add(newCircle);
                 BubbleList.Add((mousePos, MinRadius));
                 Debug.Log("Spawn Spheres:"+mousePos+" "+MinRadius);
             }
@@ -63,6 +63,22 @@ public class SpawnSpheres : MonoBehaviour
             }
             
         }
+        BubbleMerge();
+        for(int i=0; i<BubbleMergeList.Count; i++)
+            MergeGroup(i);
+            
+        for(int i=0; i<BubbleList.Count; i++)
+            FindBubbleObject(i);
+            
+        Debug.Log("MergeGroup Number:"+BubbleMergeList.Count);
+        Debug.Log("BubbleList count:"+BubbleList.Count);
+
+        if (BubbleMergeList.Count > 0)
+        {
+           foreach(var item in BubbleMergeList[0])
+               Debug.Log("MergeList unit:"+item); 
+        }
+
     }
 
     // Check if the mouse position is inside the bubble
@@ -82,15 +98,8 @@ public class SpawnSpheres : MonoBehaviour
     // Find the bubble gameobject according to the center of the circle
     void FindBubbleObject(int BubbleIndex)
     {
-        GameObject[] bubbles = GameObject.FindGameObjectsWithTag("Bubble");
-        foreach (GameObject bubble in bubbles)
-        {
-            if (Vector3.Distance(bubble.transform.position, BubbleList[BubbleIndex].center) <= 0.1)
-            { 
-                bubble.transform.localScale = Vector3.one * BubbleList[BubbleIndex].radius * 2;
-                bubble.transform.position = BubbleList[BubbleIndex].center;
-            }
-        }
+        BubbleObjects[BubbleIndex].transform.localScale = Vector3.one * BubbleList[BubbleIndex].radius * 2;
+        BubbleObjects[BubbleIndex].transform.position = BubbleList[BubbleIndex].center;
     }
     
     void BubbleMerge()
@@ -105,65 +114,91 @@ public class SpawnSpheres : MonoBehaviour
                 if (distance <= radiusSum)
                 {
                     // check if bubble i and bubble j in BubbleMergeList
-                    int ConMerged = 0;
-                    int MergeHead = 0;
-                    int MergeGroupIdx = 0;
+                    bool ConMerged = true;
+                    int MergeGroupIdx;
+                    int GroupI=-1, GroupJ=-1;
                     for (MergeGroupIdx = 0; MergeGroupIdx < BubbleMergeList.Count; MergeGroupIdx++)
                     {
                         if (BubbleMergeList[MergeGroupIdx].Contains(i))
                         {
-                            BubbleMergeList[MergeGroupIdx].Add(j);
-                            ConMerged = 1;
-                            MergeHead = BubbleMergeList[MergeGroupIdx][0];
+                            GroupI = MergeGroupIdx;
                             break;
                         }
-                        else if(BubbleMergeList[MergeGroupIdx].Contains(j))
+                        
+                        if(BubbleMergeList[MergeGroupIdx].Contains(j))
                         {
-                            BubbleMergeList[MergeGroupIdx].Add(i);
-                            ConMerged = 2;
-                            MergeHead = BubbleMergeList[MergeGroupIdx][0];
+                            GroupJ = MergeGroupIdx;
                             break;
                         }
                     }
-                    if (ConMerged==0)
-                    {
-                        BubbleMergeList.Add(new List<int> { i, j });
-                        MergeGroupIdx = BubbleMergeList.Count - 1;
-                    }
 
-                    // Merge to first bubble in the Group
-                    if (ConMerged==1)
+                    if (GroupI != -1 && GroupJ == -1)
                     {
-                        Vector3 direction = (BubbleList[MergeHead].center - BubbleList[j].center).normalized;
-                        BubbleList[j] = (BubbleList[j].center - direction * MergeSpeed * (BubbleList[j].radius / radiusSum), BubbleList[j].radius);
+                        if (BubbleList[BubbleMergeList[GroupI][0]].radius < BubbleList[i].radius)
+                        {
+                            BubbleMergeList[GroupI].Add(BubbleMergeList[GroupI][0]);
+                            BubbleMergeList[GroupI][0] = j;
+                        }
+                        else
+                        {
+                            BubbleMergeList[GroupI].Add(j);
+                        }
+                        Debug.Log("Add to GroupI");
                     }
-                    else if (ConMerged == 2)
+                    else if (GroupI == -1 && GroupJ != -1)
                     {
-                        Vector3 direction = (BubbleList[MergeHead].center - BubbleList[i].center).normalized;
-                        BubbleList[i] = (BubbleList[i].center + direction * MergeSpeed * (BubbleList[i].radius / radiusSum), BubbleList[i].radius);
+                        if (BubbleList[BubbleMergeList[GroupJ][0]].radius < BubbleList[j].radius)
+                        {
+                            BubbleMergeList[GroupJ].Add(BubbleMergeList[GroupJ][0]);
+                            BubbleMergeList[GroupJ][0] = i;
+                        }
+                        else
+                        {
+                            BubbleMergeList[GroupJ].Add(i);
+                        }
+                        Debug.Log("Add to GroupJ");
                     }
-                    else
+                    else if (GroupI == -1 && GroupJ == -1)
                     {
-                        // Move bubble based on radius ratio
-                        Vector3 direction = (BubbleList[j].center - BubbleList[i].center).normalized;
-                        BubbleList[i] = (BubbleList[i].center + direction * MergeSpeed * (BubbleList[i].radius / radiusSum), BubbleList[i].radius);
-                        BubbleList[j] = (BubbleList[j].center - direction * MergeSpeed * (BubbleList[j].radius / radiusSum), BubbleList[j].radius);
+                        if(BubbleList[i].radius > BubbleList[j].radius)
+                            BubbleMergeList.Add(new List<int> { i, j });
+                        else
+                            BubbleMergeList.Add(new List<int> { i, j });
                     }
-
-                    MergeStop(MergeGroupIdx, i, j);
-                    FindBubbleObject(i);
-                    FindBubbleObject(j);
                 }
             }
         }
     }
 
+    void MergeGroup(int MergeGroupIdx)
+    {
+        if (MergeGroupIdx >= BubbleMergeList.Count || BubbleMergeList[MergeGroupIdx].Count < 2)
+        {
+            return;
+        }
+        
+        for (int i = BubbleMergeList[MergeGroupIdx].Count - 1; i >= 1; i--)
+        {
+            Debug.Log("MergeList count:"+BubbleMergeList[MergeGroupIdx].Count);
+            if (BubbleMergeList[MergeGroupIdx][0] >= BubbleList.Count || BubbleMergeList[MergeGroupIdx][i] >= BubbleList.Count)
+            {
+                continue;
+            }
+            Vector3 direction = (BubbleList[BubbleMergeList[MergeGroupIdx][0]].center - BubbleList[BubbleMergeList[MergeGroupIdx][i]].center).normalized;
+            float radiusSum = BubbleList[BubbleMergeList[MergeGroupIdx][0]].radius + BubbleList[BubbleMergeList[MergeGroupIdx][i]].radius;
+            BubbleList[BubbleMergeList[MergeGroupIdx][i]] = (BubbleList[BubbleMergeList[MergeGroupIdx][i]].center + direction * MergeSpeed * (BubbleList[BubbleMergeList[MergeGroupIdx][i]].radius / radiusSum)*Time.deltaTime, BubbleList[BubbleMergeList[MergeGroupIdx][i]].radius);
+            MergeStop(MergeGroupIdx, BubbleMergeList[MergeGroupIdx][0], BubbleMergeList[MergeGroupIdx][i]);
+        }
+    }
+    
     void MergeStop(int MergeGroupIdx, int bubble1, int bubble2)
     {
         if (Vector3.Distance(BubbleList[bubble1].center, BubbleList[bubble2].center) <= MergeThreshold)
         {
             BubbleMergeList[MergeGroupIdx].Remove(bubble2);
             BubbleList.RemoveAt(bubble2);
+            Destroy(BubbleObjects[bubble2]);
+            BubbleObjects.RemoveAt(bubble2);
             if (BubbleMergeList[MergeGroupIdx].Count < 2)
             {
                 BubbleMergeList.RemoveAt(MergeGroupIdx);

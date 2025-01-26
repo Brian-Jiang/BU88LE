@@ -1,5 +1,6 @@
 ﻿using Graphics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -26,6 +27,13 @@ public class GameController : MonoBehaviour
         audioManager.Play("snapshot");
     }
 
+    void ReloadLevel()
+    {
+        // Reload the current level
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Debug.Log("Level reloaded!");
+    }
+
     private void Start()
     {
         camera.orthographicSize = bubbleRenderManager.transform.localScale.y / 2 / camera.aspect;
@@ -37,6 +45,11 @@ public class GameController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Snapshot();
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ReloadLevel();
         }
     }
 }
