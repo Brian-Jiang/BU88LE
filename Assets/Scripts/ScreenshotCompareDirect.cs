@@ -19,15 +19,17 @@ public class ScreenshotCompareDirect : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
 
+        int scalingFactor = 5;
+
         // 截图并缩放
         //Texture2D screenshot = CaptureScreenshotToTexture();
         //Texture2D screenshot = CaptureQuadScreenshot(quad, 512, 512);
         //Texture2D screenshot = Capture3DView(quad, 512, 512);
         //Texture2D screenshot = CaptureQuadScreenshot(quad);
         Texture2D screenshot = Capture3DView(quad);
-        Texture2D resizedScreenshot = ResizeTexture(screenshot, 50, 50);
+        Texture2D resizedScreenshot = ResizeTexture(screenshot, scalingFactor, scalingFactor);
 
-        byte[] bytes = resizedScreenshot.EncodeToPNG();
+        byte[] bytes = screenshot.EncodeToPNG();
         System.IO.File.WriteAllBytes(Application.dataPath + "/Screenshots/screenshot.png", bytes);
         Debug.Log("Quad Screenshot saved!");
 
@@ -40,7 +42,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
         }
 
         Texture2D referenceImage = LoadTexture(fullReferencePath);
-        Texture2D resizedReference = ResizeTexture(referenceImage, 50, 50);
+        Texture2D resizedReference = ResizeTexture(referenceImage, scalingFactor, scalingFactor);
 
         // 进行相似度比较
         float similarity = CompareTextures(resizedScreenshot, resizedReference);
@@ -60,7 +62,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
         RenderTexture.active = rt;
 
         UnityEngine.Graphics.Blit(source, rt);
-        Texture2D result = new Texture2D(newWidth, newHeight, TextureFormat.RGB24, false);
+        Texture2D result = new Texture2D(newWidth, newHeight, TextureFormat.RGBA32, false);
         result.ReadPixels(new Rect(0, 0, newWidth, newHeight), 0, 0);
         result.Apply();
 
@@ -183,6 +185,53 @@ public class ScreenshotCompareDirect : MonoBehaviour
 
     #endregion
 
+    //public Texture2D Capture3DView(GameObject targetObject)
+    //{
+    //    // 1. 获取 Quad 尺寸
+    //    Renderer quadRenderer = targetObject.GetComponent<Renderer>();
+    //    Vector3 quadSize = quadRenderer.bounds.size;
+    //    int width = Mathf.RoundToInt(quadSize.x * 100);  // 根据大小调整像素分辨率
+    //    int height = Mathf.RoundToInt(quadSize.y * 100);
+
+    //    // 2. 创建 RenderTexture
+    //    RenderTexture rt = new RenderTexture(width, height, 24);
+
+    //    // 3. 创建临时摄像机
+    //    GameObject tempCamObj = new GameObject("TempCamera");
+    //    Camera tempCam = tempCamObj.AddComponent<Camera>();
+
+    //    // 4. 计算摄像机位置和设置参数
+    //    float distance = Mathf.Max(quadSize.x, quadSize.y) * 2.0f;  // 根据大小调整距离
+    //    tempCam.transform.position = targetObject.transform.position + targetObject.transform.forward * -distance;
+    //    tempCam.transform.LookAt(targetObject.transform.position);
+
+    //    // 设置摄像机视口大小，使 Quad 刚好填满
+    //    tempCam.aspect = (float)width / height;
+    //    tempCam.orthographic = false;  // 透视投影，保持 3D 效果
+    //    tempCam.fieldOfView = 30f;  // 适当的 FOV 调整可以适应 Quad 大小
+
+    //    tempCam.targetTexture = rt;
+    //    tempCam.clearFlags = CameraClearFlags.SolidColor;
+    //    tempCam.backgroundColor = Color.clear;
+
+    //    // 5. 渲染目标对象
+    //    tempCam.Render();
+
+    //    // 6. 读取 RenderTexture 数据并转换为 Texture2D
+    //    RenderTexture.active = rt;
+    //    Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
+    //    screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+    //    screenshot.Apply();
+
+    //    // 7. 清理资源
+    //    RenderTexture.active = null;
+    //    tempCam.targetTexture = null;
+    //    GameObject.Destroy(tempCamObj);
+    //    rt.Release();
+
+    //    return screenshot;
+    //}
+
     public Texture2D Capture3DView(GameObject targetObject)
     {
         // 1. 获取 Quad 尺寸
@@ -191,8 +240,10 @@ public class ScreenshotCompareDirect : MonoBehaviour
         int width = Mathf.RoundToInt(quadSize.x * 100);  // 根据大小调整像素分辨率
         int height = Mathf.RoundToInt(quadSize.y * 100);
 
-        // 2. 创建 RenderTexture
-        RenderTexture rt = new RenderTexture(width, height, 24);
+        // 2. 创建 RenderTexture，支持透明通道
+        RenderTexture rt = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
+        rt.useMipMap = false;
+        rt.antiAliasing = 1;
 
         // 3. 创建临时摄像机
         GameObject tempCamObj = new GameObject("TempCamera");
@@ -203,21 +254,22 @@ public class ScreenshotCompareDirect : MonoBehaviour
         tempCam.transform.position = targetObject.transform.position + targetObject.transform.forward * -distance;
         tempCam.transform.LookAt(targetObject.transform.position);
 
-        // 设置摄像机视口大小，使 Quad 刚好填满
         tempCam.aspect = (float)width / height;
         tempCam.orthographic = false;  // 透视投影，保持 3D 效果
-        tempCam.fieldOfView = 30f;  // 适当的 FOV 调整可以适应 Quad 大小
+        tempCam.fieldOfView = 30f;
 
         tempCam.targetTexture = rt;
+
+        // 设置透明背景
         tempCam.clearFlags = CameraClearFlags.SolidColor;
-        tempCam.backgroundColor = Color.clear;
+        tempCam.backgroundColor = new Color(0, 0, 0, 0);  // 设置为全透明
 
         // 5. 渲染目标对象
         tempCam.Render();
 
-        // 6. 读取 RenderTexture 数据并转换为 Texture2D
+        // 6. 读取 RenderTexture 数据并转换为 Texture2D，使用 RGBA32 以包含透明度
         RenderTexture.active = rt;
-        Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
+        Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGBA32, false);
         screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
         screenshot.Apply();
 
@@ -230,7 +282,6 @@ public class ScreenshotCompareDirect : MonoBehaviour
         return screenshot;
     }
 
-
     Texture2D LoadTexture(string path)
     {
         byte[] fileData = File.ReadAllBytes(path);
@@ -238,6 +289,31 @@ public class ScreenshotCompareDirect : MonoBehaviour
         texture.LoadImage(fileData);  // 加载 PNG/JPG 文件
         return texture;
     }
+
+    //float CompareTextures(Texture2D tex1, Texture2D tex2)
+    //{
+    //    if (tex1.width != tex2.width || tex1.height != tex2.height)
+    //    {
+    //        Debug.LogError("图片尺寸不一致，无法比较");
+    //        return 0f;
+    //    }
+
+    //    Color32[] pixels1 = tex1.GetPixels32();
+    //    Color32[] pixels2 = tex2.GetPixels32();
+    //    int totalPixels = pixels1.Length;
+    //    int matchingPixels = 0;
+    //    float threshold = 0.0001f;
+
+    //    for (int i = 0; i < totalPixels; i++)
+    //    {
+    //        if (ColorDifference(pixels1[i], pixels2[i]) < threshold)  // 误差阈值
+    //        {
+    //            matchingPixels++;
+    //        }
+    //    }
+
+    //    return (float)matchingPixels / totalPixels;
+    //}
 
     float CompareTextures(Texture2D tex1, Texture2D tex2)
     {
@@ -251,17 +327,72 @@ public class ScreenshotCompareDirect : MonoBehaviour
         Color32[] pixels2 = tex2.GetPixels32();
         int totalPixels = pixels1.Length;
         int matchingPixels = 0;
+        float threshold = 0.1f;
+        int comparedPixels = 0;
 
         for (int i = 0; i < totalPixels; i++)
         {
-            if (ColorDifference(pixels1[i], pixels2[i]) < 0.1f)  // 误差阈值
+            if (pixels1[i].a == 0 && pixels2[i].a == 0)
+            {
+                continue;  // 跳过完全透明的像素
+            }
+
+            comparedPixels++;  // 只对非透明像素进行统计
+
+            if (ColorDifference(pixels1[i], pixels2[i]) < threshold)  // 误差阈值
             {
                 matchingPixels++;
             }
         }
 
-        return (float)matchingPixels / totalPixels;
+        return comparedPixels > 0 ? (float)matchingPixels / comparedPixels : 0f;  // 避免除以0
     }
+
+
+    //public float CompareTexturesAndSaveDiff(Texture2D tex1, Texture2D tex2, string savePath)
+    //{
+    //    if (tex1.width != tex2.width || tex1.height != tex2.height)
+    //    {
+    //        Debug.LogError("图片尺寸不一致，无法比较");
+    //        return 0f;
+    //    }
+
+    //    Color32[] pixels1 = tex1.GetPixels32();
+    //    Color32[] pixels2 = tex2.GetPixels32();
+    //    Color32[] diffPixels = new Color32[pixels1.Length];
+
+    //    int totalPixels = pixels1.Length;
+    //    int matchingPixels = 0;
+    //    float threshold = 0.0001f; // 误差阈值
+
+    //    for (int i = 0; i < totalPixels; i++)
+    //    {
+    //        if (ColorDifference(pixels1[i], pixels2[i]) < threshold)
+    //        {
+    //            matchingPixels++;
+    //            diffPixels[i] = new Color32(0, 0, 0, 0);  // 透明，表示相同
+    //        }
+    //        else
+    //        {
+    //            diffPixels[i] = new Color32(255, 0, 0, 255);  // 红色，表示不同
+    //        }
+    //    }
+
+    //    float similarity = (float)matchingPixels / totalPixels;
+
+    //    // 创建差异图
+    //    Texture2D diffTexture = new Texture2D(tex1.width, tex1.height);
+    //    diffTexture.SetPixels32(diffPixels);
+    //    diffTexture.Apply();
+
+    //    // 保存差异图为 PNG
+    //    byte[] pngData = diffTexture.EncodeToPNG();
+    //    System.IO.File.WriteAllBytes(savePath, pngData);
+
+    //    Debug.Log($"差异图已保存至: {savePath}");
+    //    return similarity;
+    //}
+
 
     public float CompareTexturesAndSaveDiff(Texture2D tex1, Texture2D tex2, string savePath)
     {
@@ -277,10 +408,19 @@ public class ScreenshotCompareDirect : MonoBehaviour
 
         int totalPixels = pixels1.Length;
         int matchingPixels = 0;
-        float threshold = 0.1f; // 误差阈值
+        float threshold = 0.1f;
+        int comparedPixels = 0;
 
         for (int i = 0; i < totalPixels; i++)
         {
+            if (pixels1[i].a == 0 && pixels2[i].a == 0)
+            {
+                diffPixels[i] = new Color32(0, 0, 0, 0);  // 透明，跳过比较
+                continue;
+            }
+
+            comparedPixels++;  // 只对非透明像素进行统计
+
             if (ColorDifference(pixels1[i], pixels2[i]) < threshold)
             {
                 matchingPixels++;
@@ -292,7 +432,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
             }
         }
 
-        float similarity = (float)matchingPixels / totalPixels;
+        float similarity = comparedPixels > 0 ? (float)matchingPixels / comparedPixels : 1f;
 
         // 创建差异图
         Texture2D diffTexture = new Texture2D(tex1.width, tex1.height);
@@ -307,12 +447,14 @@ public class ScreenshotCompareDirect : MonoBehaviour
         return similarity;
     }
 
-
-    float ColorDifference(Color32 a, Color32 b)
+    private float ColorDifference(Color32 c1, Color32 c2)
     {
-        float rDiff = Mathf.Abs(a.r - b.r) / 255f;
-        float gDiff = Mathf.Abs(a.g - b.g) / 255f;
-        float bDiff = Mathf.Abs(a.b - b.b) / 255f;
-        return (rDiff + gDiff + bDiff) / 3f;
+
+        float rDiff = (c1.r - c2.r) / 255.0f;
+        float gDiff = (c1.g - c2.g) / 255.0f;
+        float bDiff = (c1.b - c2.b) / 255.0f;
+        float aDiff = (c1.a - c2.a) / 255.0f;
+
+        return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff + aDiff * aDiff;
     }
 }
