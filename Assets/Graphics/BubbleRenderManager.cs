@@ -91,6 +91,14 @@ namespace Graphics
             
             bubbleCount--;
         }
+        
+        public void Snapshot()
+        {
+            for (int i = 0; i < bubbleCount; i++)
+            {
+                bubbleRotationSpeeds[i] = 0;
+            }
+        }
 
         private void Start()
         {
