@@ -25,6 +25,12 @@ namespace Graphics
             bubbleSizes = new float[MAX_BUBBLE_COUNT];
             
             bubbleMaterialInstance = bubbleRenderer.material;
+            
+            bubblePositions[0] = new Vector4(0.9f, 0.72f, 0, 0);
+            bubblePositions[1] = new Vector4(0.58f, 0.72f, 0, 0);
+            bubbleSizes[0] = 0.2f;
+            bubbleSizes[1] = 0.26f;
+            bubbleCount = 2;
         }
 
         private void Update()
