@@ -8,8 +8,11 @@ public class GameController : MonoBehaviour
     public BubbleRenderManager bubbleRenderManager;
     public MeshRenderer refImageRenderer;
     public AudioManager audioManager;
+    public ScreenshotCompareDirect screenshotCompareDirect;
+    public SpawnSpheres bubbleSpawner;
     
     private Material refImageMaterialInstance;
+    private int lastSize = 0;
     
     public void SetRefImage(Texture2D texture)
     {
@@ -25,6 +28,8 @@ public class GameController : MonoBehaviour
     {
         // bubbleRenderManager.Snapshot();
         audioManager.Play("snapshot");
+        var similarity = screenshotCompareDirect.CaptureAndCompare("ReferenceScreenshots/Level1.png");
+        
     }
 
     void ReloadLevel()
@@ -51,5 +56,8 @@ public class GameController : MonoBehaviour
         {
             ReloadLevel();
         }
+        
+        var bubbleList = bubbleSpawner.BubbleList;
+        
     }
 }

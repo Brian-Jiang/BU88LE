@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.VisualScripting;
@@ -7,7 +8,7 @@ public class SpawnSpheres : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     
-    public GameObject Bubble;
+    // public GameObject Bubble;
     public Camera MainCamera;
     public float GrowthSpeed = 2f;
     public float MinRadius = 1f;
@@ -16,7 +17,9 @@ public class SpawnSpheres : MonoBehaviour
     public float MergeThreshold = 0.1f;
     public List<(Vector3 center, float radius)> BubbleList = new();
     public List<List<int>> BubbleMergeList = new();
-    private List<GameObject> BubbleObjects = new();
+    // private List<GameObject> BubbleObjects = new();
+    
+    public event Action OnAddBubble;
     
     void Start()
     {
@@ -36,10 +39,11 @@ public class SpawnSpheres : MonoBehaviour
             mousePos.z = 0; 
             if (FindBubble(mousePos)==-1)
             {
-                GameObject newCircle = Instantiate(Bubble, mousePos, quaternion.identity);
-                newCircle.transform.localScale = Vector3.one * (MinRadius * 2);
-                BubbleObjects.Add(newCircle);
+                // GameObject newCircle = Instantiate(Bubble, mousePos, quaternion.identity);
+                // newCircle.transform.localScale = Vector3.one * (MinRadius * 2);
+                // BubbleObjects.Add(newCircle);
                 BubbleList.Add((mousePos, MinRadius));
+                OnAddBubble?.Invoke();
                 Debug.Log("Spawn Spheres:"+mousePos+" "+MinRadius);
             }
         }
@@ -59,7 +63,7 @@ public class SpawnSpheres : MonoBehaviour
                 BubbleList[currCenterIndex] = bubble;
                 //Debug.Log("Radius:"+bubble.radius);
                 
-                FindBubbleObject(currCenterIndex);
+                // FindBubbleObject(currCenterIndex);
             }
             
         }
@@ -67,17 +71,17 @@ public class SpawnSpheres : MonoBehaviour
         for(int i=0; i<BubbleMergeList.Count; i++)
             MergeGroup(i);
             
-        for(int i=0; i<BubbleList.Count; i++)
-            FindBubbleObject(i);
+        // for(int i=0; i<BubbleList.Count; i++)
+            // FindBubbleObject(i);
             
-        Debug.Log("MergeGroup Number:"+BubbleMergeList.Count);
-        Debug.Log("BubbleList count:"+BubbleList.Count);
+        // Debug.Log("MergeGroup Number:"+BubbleMergeList.Count);
+        // Debug.Log("BubbleList count:"+BubbleList.Count);
 
-        if (BubbleMergeList.Count > 0)
-        {
-           foreach(var item in BubbleMergeList[0])
-               Debug.Log("MergeList unit:"+item); 
-        }
+        // if (BubbleMergeList.Count > 0)
+        // {
+        //    foreach(var item in BubbleMergeList[0])
+        //        Debug.Log("MergeList unit:"+item); 
+        // }
 
     }
 
@@ -96,11 +100,11 @@ public class SpawnSpheres : MonoBehaviour
     }
     
     // Find the bubble gameobject according to the center of the circle
-    void FindBubbleObject(int BubbleIndex)
-    {
-        BubbleObjects[BubbleIndex].transform.localScale = Vector3.one * BubbleList[BubbleIndex].radius * 2;
-        BubbleObjects[BubbleIndex].transform.position = BubbleList[BubbleIndex].center;
-    }
+    // void FindBubbleObject(int BubbleIndex)
+    // {
+    //     BubbleObjects[BubbleIndex].transform.localScale = Vector3.one * BubbleList[BubbleIndex].radius * 2;
+    //     BubbleObjects[BubbleIndex].transform.position = BubbleList[BubbleIndex].center;
+    // }
     
     void BubbleMerge()
     {
@@ -195,8 +199,8 @@ public class SpawnSpheres : MonoBehaviour
         {
             BubbleMergeList[MergeGroupIdx].Remove(bubble2);
             BubbleList.RemoveAt(bubble2);
-            Destroy(BubbleObjects[bubble2]);
-            BubbleObjects.RemoveAt(bubble2);
+            // Destroy(BubbleObjects[bubble2]);
+            // BubbleObjects.RemoveAt(bubble2);
             if (BubbleMergeList[MergeGroupIdx].Count < 2)
             {
                 BubbleMergeList.RemoveAt(MergeGroupIdx);

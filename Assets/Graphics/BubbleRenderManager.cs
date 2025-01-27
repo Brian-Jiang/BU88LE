@@ -40,6 +40,17 @@ namespace Graphics
             
             return bubbleCount - 1;
         }
+
+        public void AddBubble()
+        {
+            if (bubbleCount >= MAX_BUBBLE_COUNT)
+            {
+                Debug.LogWarning("Bubble count exceeded maximum limit");
+                return;
+            }
+            
+            bubbleCount++;
+        }
         
         public void SetBubblePosition(int index, Vector3 position)
         {

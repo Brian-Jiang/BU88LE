@@ -4,24 +4,24 @@ using System.Collections;
 
 public class ScreenshotCompareDirect : MonoBehaviour
 {
-    public GameObject quad;  // ÐèÒª½ØÍ¼µÄ Quad ¶ÔÏó
-    public string referenceImagePath = "ReferenceScreenshots/Level1.png"; // ¹Ø¿¨²Î¿¼Í¼Æ¬Â·¾¶£¨Ïà¶ÔÂ·¾¶£©
+    public GameObject quad;  // ï¿½ï¿½Òªï¿½ï¿½Í¼ï¿½ï¿½ Quad ï¿½ï¿½ï¿½ï¿½
+    // public string referenceImagePath = "ReferenceScreenshots/Level1.png"; // ï¿½Ø¿ï¿½ï¿½Î¿ï¿½Í¼Æ¬Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            StartCoroutine(CaptureAndCompare());
-        }
+        // if (Input.GetKeyDown(KeyCode.Space))
+        // {
+        //     CaptureAndCompare();
+        // }
     }
 
-    IEnumerator CaptureAndCompare()
+    public float CaptureAndCompare(string referenceImagePath)
     {
-        yield return new WaitForEndOfFrame();
+        // yield return new WaitForEndOfFrame();
 
         int scalingFactor = 5;
 
-        // ½ØÍ¼²¢Ëõ·Å
+        // ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         //Texture2D screenshot = CaptureScreenshotToTexture();
         //Texture2D screenshot = CaptureQuadScreenshot(quad, 512, 512);
         //Texture2D screenshot = Capture3DView(quad, 512, 512);
@@ -33,27 +33,29 @@ public class ScreenshotCompareDirect : MonoBehaviour
         System.IO.File.WriteAllBytes(Application.dataPath + "/Screenshots/screenshot.png", bytes);
         Debug.Log("Quad Screenshot saved!");
 
-        // ¼ÓÔØ²Î¿¼Í¼Æ¬²¢Ëõ·Å
+        // ï¿½ï¿½ï¿½Ø²Î¿ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         string fullReferencePath = Path.Combine(Application.dataPath, referenceImagePath);
         if (!File.Exists(fullReferencePath))
         {
-            Debug.LogError("ÕÒ²»µ½²Î¿¼½ØÍ¼: " + fullReferencePath);
-            yield break;
+            Debug.LogError("ï¿½Ò²ï¿½ï¿½ï¿½ï¿½Î¿ï¿½ï¿½ï¿½Í¼: " + fullReferencePath);
+            return 0f;
         }
 
         Texture2D referenceImage = LoadTexture(fullReferencePath);
         Texture2D resizedReference = ResizeTexture(referenceImage, scalingFactor, scalingFactor);
 
-        // ½øÐÐÏàËÆ¶È±È½Ï
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶È±È½ï¿½
         float similarity = CompareTextures(resizedScreenshot, resizedReference);
-        float similarityAndSaveDiff = CompareTexturesAndSaveDiff(resizedScreenshot, resizedReference, Application.dataPath + "/Screenshots/diff.png");
-        Debug.Log($"µ±Ç°¹Ø¿¨Óë²Î¿¼Í¼Æ¬µÄÏàËÆ¶È: {similarity * 100:F2}%");
+        // float similarityAndSaveDiff = CompareTexturesAndSaveDiff(resizedScreenshot, resizedReference, Application.dataPath + "/Screenshots/diff.png");
+        Debug.Log($"ï¿½ï¿½Ç°ï¿½Ø¿ï¿½ï¿½ï¿½Î¿ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½: {similarity * 100:F2}%");
 
-        // ÊÍ·ÅÎÆÀí
+        // ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½
         Destroy(screenshot);
         Destroy(resizedScreenshot);
         Destroy(referenceImage);
         Destroy(resizedReference);
+
+        return similarity;
     }
 
     Texture2D ResizeTexture(Texture2D source, int newWidth, int newHeight)
@@ -72,11 +74,11 @@ public class ScreenshotCompareDirect : MonoBehaviour
         return result;
     }
 
-    #region ÆúÓÃµÄ½ØÍ¼·½·¨
+    #region ï¿½ï¿½ï¿½ÃµÄ½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
 
     //Texture2D CaptureScreenshotToTexture()
     //{
-    //    // ½ØÈ¡ÆÁÄ»³ß´ç
+    //    // ï¿½ï¿½È¡ï¿½ï¿½Ä»ï¿½ß´ï¿½
     //    int width = Screen.width;
     //    int height = Screen.height;
 
@@ -84,7 +86,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
     //    screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
     //    screenshot.Apply();
 
-    //    Debug.Log("ÒÑ½ØÍ¼²¢´æÈëÄÚ´æ");
+    //    Debug.Log("ï¿½Ñ½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½");
     //    return screenshot;
     //}
 
@@ -92,24 +94,24 @@ public class ScreenshotCompareDirect : MonoBehaviour
     //{
 
 
-    //    // 1. ´´½¨ RenderTexture
+    //    // 1. ï¿½ï¿½ï¿½ï¿½ RenderTexture
     //    RenderTexture rt = new RenderTexture(width, height, 24);
 
-    //    // 2. »ñÈ¡ Quad ÉÏµÄ²ÄÖÊºÍÖ÷ÌùÍ¼
+    //    // 2. ï¿½ï¿½È¡ Quad ï¿½ÏµÄ²ï¿½ï¿½Êºï¿½ï¿½ï¿½ï¿½ï¿½Í¼
     //    Renderer quadRenderer = quad.GetComponent<Renderer>();
     //    Material quadMaterial = quadRenderer.material;
     //    Texture quadTexture = quadMaterial.mainTexture;
 
-    //    // 3. ½«²ÄÖÊÉÏµÄÌùÍ¼äÖÈ¾µ½ RenderTexture
+    //    // 3. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½Í¼ï¿½ï¿½È¾ï¿½ï¿½ RenderTexture
     //    UnityEngine.Graphics.Blit(quadTexture, rt);
 
-    //    // 4. ¶ÁÈ¡ RenderTexture Êý¾Ý²¢×ª»»Îª Texture2D
+    //    // 4. ï¿½ï¿½È¡ RenderTexture ï¿½ï¿½ï¿½Ý²ï¿½×ªï¿½ï¿½Îª Texture2D
     //    RenderTexture.active = rt;
     //    Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
     //    screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
     //    screenshot.Apply();
 
-    //    // 5. ÇåÀí RenderTexture
+    //    // 5. ï¿½ï¿½ï¿½ï¿½ RenderTexture
     //    RenderTexture.active = null;
     //    rt.Release();
 
@@ -120,31 +122,31 @@ public class ScreenshotCompareDirect : MonoBehaviour
     //{
 
 
-    //    // 1. ´´½¨ RenderTexture
+    //    // 1. ï¿½ï¿½ï¿½ï¿½ RenderTexture
     //    RenderTexture rt = new RenderTexture(width, height, 24);
 
-    //    // 2. ´´½¨Ò»¸öÐÂµÄÁÙÊ±ÉãÏñ»ú
+    //    // 2. ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
     //    GameObject tempCamObj = new GameObject("TempCamera");
     //    Camera tempCam = tempCamObj.AddComponent<Camera>();
 
-    //    // 3. ÉèÖÃÉãÏñ»úµÄ²ÎÊý
-    //    tempCam.transform.position = targetObject.transform.position + targetObject.transform.forward * -5f; // ÉèÖÃÊÓ½Ç¾àÀë
-    //    tempCam.transform.LookAt(targetObject.transform);  // ÉãÏñ»ú³¯ÏòÄ¿±êÎïÌå
+    //    // 3. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½
+    //    tempCam.transform.position = targetObject.transform.position + targetObject.transform.forward * -5f; // ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Ç¾ï¿½ï¿½ï¿½
+    //    tempCam.transform.LookAt(targetObject.transform);  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     //    tempCam.targetTexture = rt;
     //    tempCam.clearFlags = CameraClearFlags.SolidColor;
     //    tempCam.backgroundColor = Color.clear;
-    //    tempCam.orthographic = false;  // Í¸ÊÓÍ¶Ó°
+    //    tempCam.orthographic = false;  // Í¸ï¿½ï¿½Í¶Ó°
 
-    //    // 4. äÖÈ¾Ä¿±ê¶ÔÏó
+    //    // 4. ï¿½ï¿½È¾Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½
     //    tempCam.Render();
 
-    //    // 5. ¶ÁÈ¡ RenderTexture Êý¾Ý²¢×ª»»Îª Texture2D
+    //    // 5. ï¿½ï¿½È¡ RenderTexture ï¿½ï¿½ï¿½Ý²ï¿½×ªï¿½ï¿½Îª Texture2D
     //    RenderTexture.active = rt;
     //    Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
     //    screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
     //    screenshot.Apply();
 
-    //    // 6. ÇåÀí×ÊÔ´
+    //    // 6. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
     //    RenderTexture.active = null;
     //    tempCam.targetTexture = null;
     //    GameObject.Destroy(tempCamObj);
@@ -155,28 +157,28 @@ public class ScreenshotCompareDirect : MonoBehaviour
 
     //public Texture2D CaptureQuadScreenshot(GameObject quad)
     //{
-    //    // »ñÈ¡ Quad µÄ³ß´ç£¨»ùÓÚ¾Ö²¿Ëõ·Å£©
+    //    // ï¿½ï¿½È¡ Quad ï¿½Ä³ß´ç£¨ï¿½ï¿½ï¿½Ú¾Ö²ï¿½ï¿½ï¿½ï¿½Å£ï¿½
     //    Renderer quadRenderer = quad.GetComponent<Renderer>();
-    //    int width = Mathf.RoundToInt(quadRenderer.bounds.size.x * 100);  // ×ª»»ÎªÏñËØµ¥Î»
+    //    int width = Mathf.RoundToInt(quadRenderer.bounds.size.x * 100);  // ×ªï¿½ï¿½Îªï¿½ï¿½ï¿½Øµï¿½Î»
     //    int height = Mathf.RoundToInt(quadRenderer.bounds.size.y * 100);
 
-    //    // ´´½¨ RenderTexture
+    //    // ï¿½ï¿½ï¿½ï¿½ RenderTexture
     //    RenderTexture rt = new RenderTexture(width, height, 24);
 
-    //    // »ñÈ¡ Quad µÄ²ÄÖÊºÍÖ÷ÌùÍ¼
+    //    // ï¿½ï¿½È¡ Quad ï¿½Ä²ï¿½ï¿½Êºï¿½ï¿½ï¿½ï¿½ï¿½Í¼
     //    Material quadMaterial = quadRenderer.material;
     //    Texture quadTexture = quadMaterial.mainTexture;
 
-    //    // äÖÈ¾µ½ RenderTexture
+    //    // ï¿½ï¿½È¾ï¿½ï¿½ RenderTexture
     //    UnityEngine.Graphics.Blit(quadTexture, rt);
 
-    //    // ¶ÁÈ¡ RenderTexture Êý¾Ý²¢×ª»»Îª Texture2D
+    //    // ï¿½ï¿½È¡ RenderTexture ï¿½ï¿½ï¿½Ý²ï¿½×ªï¿½ï¿½Îª Texture2D
     //    RenderTexture.active = rt;
     //    Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
     //    screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
     //    screenshot.Apply();
 
-    //    // ÇåÀí×ÊÔ´
+    //    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
     //    RenderTexture.active = null;
     //    rt.Release();
 
@@ -187,43 +189,43 @@ public class ScreenshotCompareDirect : MonoBehaviour
 
     //public Texture2D Capture3DView(GameObject targetObject)
     //{
-    //    // 1. »ñÈ¡ Quad ³ß´ç
+    //    // 1. ï¿½ï¿½È¡ Quad ï¿½ß´ï¿½
     //    Renderer quadRenderer = targetObject.GetComponent<Renderer>();
     //    Vector3 quadSize = quadRenderer.bounds.size;
-    //    int width = Mathf.RoundToInt(quadSize.x * 100);  // ¸ù¾Ý´óÐ¡µ÷ÕûÏñËØ·Ö±æÂÊ
+    //    int width = Mathf.RoundToInt(quadSize.x * 100);  // ï¿½ï¿½ï¿½Ý´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø·Ö±ï¿½ï¿½ï¿½
     //    int height = Mathf.RoundToInt(quadSize.y * 100);
 
-    //    // 2. ´´½¨ RenderTexture
+    //    // 2. ï¿½ï¿½ï¿½ï¿½ RenderTexture
     //    RenderTexture rt = new RenderTexture(width, height, 24);
 
-    //    // 3. ´´½¨ÁÙÊ±ÉãÏñ»ú
+    //    // 3. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
     //    GameObject tempCamObj = new GameObject("TempCamera");
     //    Camera tempCam = tempCamObj.AddComponent<Camera>();
 
-    //    // 4. ¼ÆËãÉãÏñ»úÎ»ÖÃºÍÉèÖÃ²ÎÊý
-    //    float distance = Mathf.Max(quadSize.x, quadSize.y) * 2.0f;  // ¸ù¾Ý´óÐ¡µ÷Õû¾àÀë
+    //    // 4. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ãºï¿½ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½
+    //    float distance = Mathf.Max(quadSize.x, quadSize.y) * 2.0f;  // ï¿½ï¿½ï¿½Ý´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     //    tempCam.transform.position = targetObject.transform.position + targetObject.transform.forward * -distance;
     //    tempCam.transform.LookAt(targetObject.transform.position);
 
-    //    // ÉèÖÃÉãÏñ»úÊÓ¿Ú´óÐ¡£¬Ê¹ Quad ¸ÕºÃÌîÂú
+    //    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿Ú´ï¿½Ð¡ï¿½ï¿½Ê¹ Quad ï¿½Õºï¿½ï¿½ï¿½ï¿½ï¿½
     //    tempCam.aspect = (float)width / height;
-    //    tempCam.orthographic = false;  // Í¸ÊÓÍ¶Ó°£¬±£³Ö 3D Ð§¹û
-    //    tempCam.fieldOfView = 30f;  // ÊÊµ±µÄ FOV µ÷Õû¿ÉÒÔÊÊÓ¦ Quad ´óÐ¡
+    //    tempCam.orthographic = false;  // Í¸ï¿½ï¿½Í¶Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 3D Ð§ï¿½ï¿½
+    //    tempCam.fieldOfView = 30f;  // ï¿½Êµï¿½ï¿½ï¿½ FOV ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ Quad ï¿½ï¿½Ð¡
 
     //    tempCam.targetTexture = rt;
     //    tempCam.clearFlags = CameraClearFlags.SolidColor;
     //    tempCam.backgroundColor = Color.clear;
 
-    //    // 5. äÖÈ¾Ä¿±ê¶ÔÏó
+    //    // 5. ï¿½ï¿½È¾Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½
     //    tempCam.Render();
 
-    //    // 6. ¶ÁÈ¡ RenderTexture Êý¾Ý²¢×ª»»Îª Texture2D
+    //    // 6. ï¿½ï¿½È¡ RenderTexture ï¿½ï¿½ï¿½Ý²ï¿½×ªï¿½ï¿½Îª Texture2D
     //    RenderTexture.active = rt;
     //    Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGB24, false);
     //    screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
     //    screenshot.Apply();
 
-    //    // 7. ÇåÀí×ÊÔ´
+    //    // 7. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
     //    RenderTexture.active = null;
     //    tempCam.targetTexture = null;
     //    GameObject.Destroy(tempCamObj);
@@ -234,46 +236,46 @@ public class ScreenshotCompareDirect : MonoBehaviour
 
     public Texture2D Capture3DView(GameObject targetObject)
     {
-        // 1. »ñÈ¡ Quad ³ß´ç
+        // 1. ï¿½ï¿½È¡ Quad ï¿½ß´ï¿½
         Renderer quadRenderer = targetObject.GetComponent<Renderer>();
         Vector3 quadSize = quadRenderer.bounds.size;
-        int width = Mathf.RoundToInt(quadSize.x * 100);  // ¸ù¾Ý´óÐ¡µ÷ÕûÏñËØ·Ö±æÂÊ
+        int width = Mathf.RoundToInt(quadSize.x * 100);  // ï¿½ï¿½ï¿½Ý´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø·Ö±ï¿½ï¿½ï¿½
         int height = Mathf.RoundToInt(quadSize.y * 100);
 
-        // 2. ´´½¨ RenderTexture£¬Ö§³ÖÍ¸Ã÷Í¨µÀ
+        // 2. ï¿½ï¿½ï¿½ï¿½ RenderTextureï¿½ï¿½Ö§ï¿½ï¿½Í¸ï¿½ï¿½Í¨ï¿½ï¿½
         RenderTexture rt = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
         rt.useMipMap = false;
         rt.antiAliasing = 1;
 
-        // 3. ´´½¨ÁÙÊ±ÉãÏñ»ú
+        // 3. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
         GameObject tempCamObj = new GameObject("TempCamera");
         Camera tempCam = tempCamObj.AddComponent<Camera>();
 
-        // 4. ¼ÆËãÉãÏñ»úÎ»ÖÃºÍÉèÖÃ²ÎÊý
-        float distance = Mathf.Max(quadSize.x, quadSize.y) * 2.0f;  // ¸ù¾Ý´óÐ¡µ÷Õû¾àÀë
+        // 4. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ãºï¿½ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½
+        float distance = Mathf.Max(quadSize.x, quadSize.y) * 2.0f;  // ï¿½ï¿½ï¿½Ý´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         tempCam.transform.position = targetObject.transform.position + targetObject.transform.forward * -distance;
         tempCam.transform.LookAt(targetObject.transform.position);
 
         tempCam.aspect = (float)width / height;
-        tempCam.orthographic = false;  // Í¸ÊÓÍ¶Ó°£¬±£³Ö 3D Ð§¹û
+        tempCam.orthographic = false;  // Í¸ï¿½ï¿½Í¶Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 3D Ð§ï¿½ï¿½
         tempCam.fieldOfView = 30f;
 
         tempCam.targetTexture = rt;
 
-        // ÉèÖÃÍ¸Ã÷±³¾°
+        // ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         tempCam.clearFlags = CameraClearFlags.SolidColor;
-        tempCam.backgroundColor = new Color(0, 0, 0, 0);  // ÉèÖÃÎªÈ«Í¸Ã÷
+        tempCam.backgroundColor = new Color(0, 0, 0, 0);  // ï¿½ï¿½ï¿½ï¿½ÎªÈ«Í¸ï¿½ï¿½
 
-        // 5. äÖÈ¾Ä¿±ê¶ÔÏó
+        // 5. ï¿½ï¿½È¾Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½
         tempCam.Render();
 
-        // 6. ¶ÁÈ¡ RenderTexture Êý¾Ý²¢×ª»»Îª Texture2D£¬Ê¹ÓÃ RGBA32 ÒÔ°üº¬Í¸Ã÷¶È
+        // 6. ï¿½ï¿½È¡ RenderTexture ï¿½ï¿½ï¿½Ý²ï¿½×ªï¿½ï¿½Îª Texture2Dï¿½ï¿½Ê¹ï¿½ï¿½ RGBA32 ï¿½Ô°ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½
         RenderTexture.active = rt;
         Texture2D screenshot = new Texture2D(width, height, TextureFormat.RGBA32, false);
         screenshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
         screenshot.Apply();
 
-        // 7. ÇåÀí×ÊÔ´
+        // 7. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
         RenderTexture.active = null;
         tempCam.targetTexture = null;
         GameObject.Destroy(tempCamObj);
@@ -285,8 +287,8 @@ public class ScreenshotCompareDirect : MonoBehaviour
     Texture2D LoadTexture(string path)
     {
         byte[] fileData = File.ReadAllBytes(path);
-        Texture2D texture = new Texture2D(2, 2);  // Ä¬ÈÏ´óÐ¡£¬»á±»Í¼Æ¬Êý¾Ý¸²¸Ç
-        texture.LoadImage(fileData);  // ¼ÓÔØ PNG/JPG ÎÄ¼þ
+        Texture2D texture = new Texture2D(2, 2);  // Ä¬ï¿½Ï´ï¿½Ð¡ï¿½ï¿½ï¿½á±»Í¼Æ¬ï¿½ï¿½ï¿½Ý¸ï¿½ï¿½ï¿½
+        texture.LoadImage(fileData);  // ï¿½ï¿½ï¿½ï¿½ PNG/JPG ï¿½Ä¼ï¿½
         return texture;
     }
 
@@ -294,7 +296,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
     //{
     //    if (tex1.width != tex2.width || tex1.height != tex2.height)
     //    {
-    //        Debug.LogError("Í¼Æ¬³ß´ç²»Ò»ÖÂ£¬ÎÞ·¨±È½Ï");
+    //        Debug.LogError("Í¼Æ¬ï¿½ß´ç²»Ò»ï¿½Â£ï¿½ï¿½Þ·ï¿½ï¿½È½ï¿½");
     //        return 0f;
     //    }
 
@@ -306,7 +308,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
 
     //    for (int i = 0; i < totalPixels; i++)
     //    {
-    //        if (ColorDifference(pixels1[i], pixels2[i]) < threshold)  // Îó²îãÐÖµ
+    //        if (ColorDifference(pixels1[i], pixels2[i]) < threshold)  // ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
     //        {
     //            matchingPixels++;
     //        }
@@ -319,7 +321,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
     {
         if (tex1.width != tex2.width || tex1.height != tex2.height)
         {
-            Debug.LogError("Í¼Æ¬³ß´ç²»Ò»ÖÂ£¬ÎÞ·¨±È½Ï");
+            Debug.LogError("Í¼Æ¬ï¿½ß´ç²»Ò»ï¿½Â£ï¿½ï¿½Þ·ï¿½ï¿½È½ï¿½");
             return 0f;
         }
 
@@ -334,18 +336,18 @@ public class ScreenshotCompareDirect : MonoBehaviour
         {
             if (pixels1[i].a == 0 && pixels2[i].a == 0)
             {
-                continue;  // Ìø¹ýÍêÈ«Í¸Ã÷µÄÏñËØ
+                continue;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             }
 
-            comparedPixels++;  // Ö»¶Ô·ÇÍ¸Ã÷ÏñËØ½øÐÐÍ³¼Æ
+            comparedPixels++;  // Ö»ï¿½Ô·ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½Ø½ï¿½ï¿½ï¿½Í³ï¿½ï¿½
 
-            if (ColorDifference(pixels1[i], pixels2[i]) < threshold)  // Îó²îãÐÖµ
+            if (ColorDifference(pixels1[i], pixels2[i]) < threshold)  // ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
             {
                 matchingPixels++;
             }
         }
 
-        return comparedPixels > 0 ? (float)matchingPixels / comparedPixels : 0f;  // ±ÜÃâ³ýÒÔ0
+        return comparedPixels > 0 ? (float)matchingPixels / comparedPixels : 0f;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0
     }
 
 
@@ -353,7 +355,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
     //{
     //    if (tex1.width != tex2.width || tex1.height != tex2.height)
     //    {
-    //        Debug.LogError("Í¼Æ¬³ß´ç²»Ò»ÖÂ£¬ÎÞ·¨±È½Ï");
+    //        Debug.LogError("Í¼Æ¬ï¿½ß´ç²»Ò»ï¿½Â£ï¿½ï¿½Þ·ï¿½ï¿½È½ï¿½");
     //        return 0f;
     //    }
 
@@ -363,33 +365,33 @@ public class ScreenshotCompareDirect : MonoBehaviour
 
     //    int totalPixels = pixels1.Length;
     //    int matchingPixels = 0;
-    //    float threshold = 0.0001f; // Îó²îãÐÖµ
+    //    float threshold = 0.0001f; // ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 
     //    for (int i = 0; i < totalPixels; i++)
     //    {
     //        if (ColorDifference(pixels1[i], pixels2[i]) < threshold)
     //        {
     //            matchingPixels++;
-    //            diffPixels[i] = new Color32(0, 0, 0, 0);  // Í¸Ã÷£¬±íÊ¾ÏàÍ¬
+    //            diffPixels[i] = new Color32(0, 0, 0, 0);  // Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Í¬
     //        }
     //        else
     //        {
-    //            diffPixels[i] = new Color32(255, 0, 0, 255);  // ºìÉ«£¬±íÊ¾²»Í¬
+    //            diffPixels[i] = new Color32(255, 0, 0, 255);  // ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Í¬
     //        }
     //    }
 
     //    float similarity = (float)matchingPixels / totalPixels;
 
-    //    // ´´½¨²îÒìÍ¼
+    //    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
     //    Texture2D diffTexture = new Texture2D(tex1.width, tex1.height);
     //    diffTexture.SetPixels32(diffPixels);
     //    diffTexture.Apply();
 
-    //    // ±£´æ²îÒìÍ¼Îª PNG
+    //    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Îª PNG
     //    byte[] pngData = diffTexture.EncodeToPNG();
     //    System.IO.File.WriteAllBytes(savePath, pngData);
 
-    //    Debug.Log($"²îÒìÍ¼ÒÑ±£´æÖÁ: {savePath}");
+    //    Debug.Log($"ï¿½ï¿½ï¿½ï¿½Í¼ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½: {savePath}");
     //    return similarity;
     //}
 
@@ -398,7 +400,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
     {
         if (tex1.width != tex2.width || tex1.height != tex2.height)
         {
-            Debug.LogError("Í¼Æ¬³ß´ç²»Ò»ÖÂ£¬ÎÞ·¨±È½Ï");
+            Debug.LogError("Í¼Æ¬ï¿½ß´ç²»Ò»ï¿½Â£ï¿½ï¿½Þ·ï¿½ï¿½È½ï¿½");
             return 0f;
         }
 
@@ -415,35 +417,35 @@ public class ScreenshotCompareDirect : MonoBehaviour
         {
             if (pixels1[i].a == 0 && pixels2[i].a == 0)
             {
-                diffPixels[i] = new Color32(0, 0, 0, 0);  // Í¸Ã÷£¬Ìø¹ý±È½Ï
+                diffPixels[i] = new Color32(0, 0, 0, 0);  // Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È½ï¿½
                 continue;
             }
 
-            comparedPixels++;  // Ö»¶Ô·ÇÍ¸Ã÷ÏñËØ½øÐÐÍ³¼Æ
+            comparedPixels++;  // Ö»ï¿½Ô·ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½Ø½ï¿½ï¿½ï¿½Í³ï¿½ï¿½
 
             if (ColorDifference(pixels1[i], pixels2[i]) < threshold)
             {
                 matchingPixels++;
-                diffPixels[i] = new Color32(0, 0, 0, 0);  // Í¸Ã÷£¬±íÊ¾ÏàÍ¬
+                diffPixels[i] = new Color32(0, 0, 0, 0);  // Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Í¬
             }
             else
             {
-                diffPixels[i] = new Color32(255, 0, 0, 255);  // ºìÉ«£¬±íÊ¾²»Í¬
+                diffPixels[i] = new Color32(255, 0, 0, 255);  // ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Í¬
             }
         }
 
         float similarity = comparedPixels > 0 ? (float)matchingPixels / comparedPixels : 1f;
 
-        // ´´½¨²îÒìÍ¼
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
         Texture2D diffTexture = new Texture2D(tex1.width, tex1.height);
         diffTexture.SetPixels32(diffPixels);
         diffTexture.Apply();
 
-        // ±£´æ²îÒìÍ¼Îª PNG
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Îª PNG
         byte[] pngData = diffTexture.EncodeToPNG();
         System.IO.File.WriteAllBytes(savePath, pngData);
 
-        Debug.Log($"²îÒìÍ¼ÒÑ±£´æÖÁ: {savePath}");
+        Debug.Log($"ï¿½ï¿½ï¿½ï¿½Í¼ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½: {savePath}");
         return similarity;
     }
 
