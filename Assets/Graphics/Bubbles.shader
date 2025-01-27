@@ -131,7 +131,7 @@
                     // pos.x = ((pos.x + 1.0) % 2) - 1.0;
                     // pos.y = ((pos.y + 1.0) % 2) - 1.0;
                     float bubbleDist = sdCircle(bubbleCenterToPosition, size);
-                    d = smin(d, bubbleDist, 0.05);
+                    d = smin(d, bubbleDist, 0.01);
                     // d = min(d, bubbleDist);
                     // d = smin(d, sdCircle(pos, size), 0.1);
                     if (bubbleDist < closestBubbleDist)
@@ -187,7 +187,7 @@
                 if (true || totalWeight > 1.0)
                 {
                     // float mask = smoothstep(-0.01, 0.01, closestBubbleDist);
-                    float mask = smoothstep(-0.01, 0.005, d);
+                    float mask = smoothstep(-0.0001, 0.0001, d);
                     mask = saturate(1.0 - mask);
                     
                     float2 closestBubbleUV = (closestBubbleCenterToPosition / (2.0 * closestBubbleSize)) + 0.5; // Map pos to [0,1] for texture sampling

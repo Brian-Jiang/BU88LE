@@ -43,6 +43,9 @@ public class GameController : MonoBehaviour
     {
         camera.orthographicSize = bubbleRenderManager.transform.localScale.y / 2 / camera.aspect;
         refImageMaterialInstance = refImageRenderer.material;
+        
+        bubbleSpawner.OnAddBubble += OnAddBubble;
+        bubbleSpawner.OnRemoveBubble += OnRemoveBubble;
     }
 
     private void Update()
@@ -58,6 +61,28 @@ public class GameController : MonoBehaviour
         }
         
         var bubbleList = bubbleSpawner.BubbleList;
-        
+        for (int i = 0; i < bubbleList.Count; i++)
+        {
+            var screenPos = camera.WorldToViewportPoint(bubbleList[i].center);
+            screenPos.y = (screenPos.y - 0.5f) / camera.aspect + 0.5f;
+            bubbleRenderManager.SetBubblePosition(i, screenPos);
+            bubbleRenderManager.SetBubbleSize(i, bubbleList[i].radius);
+        }
+    }
+    
+    private void OnAddBubble()
+    {
+        // lastSize = bubbleSpawner.BubbleList.Count;
+        bubbleRenderManager.AddBubble();
+    }
+    
+    private void OnRemoveBubble(int index)
+    {
+        // if (bubbleSpawner.BubbleList.Count < lastSize)
+        // {
+        //     lastSize = bubbleSpawner.BubbleList.Count;
+        //     audioManager.Play("pop");
+        // }
+        bubbleRenderManager.RemoveBubble(index);
     }
 }

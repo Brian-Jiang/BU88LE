@@ -1198,9 +1198,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MainCamera: {fileID: 988833077}
-  GrowthSpeed: 2
-  MinRadius: 1
-  MaxRadius: 5
+  GrowthSpeed: 0.05
+  MinRadius: 0.01
+  MaxRadius: 0.5
   MergeSpeed: 2
   MergeThreshold: 0.1
 --- !u!4 &1483605272

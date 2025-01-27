@@ -20,6 +20,7 @@ public class SpawnSpheres : MonoBehaviour
     // private List<GameObject> BubbleObjects = new();
     
     public event Action OnAddBubble;
+    public event Action<int> OnRemoveBubble; 
     
     void Start()
     {
@@ -199,6 +200,7 @@ public class SpawnSpheres : MonoBehaviour
         {
             BubbleMergeList[MergeGroupIdx].Remove(bubble2);
             BubbleList.RemoveAt(bubble2);
+            OnRemoveBubble?.Invoke(bubble2);
             // Destroy(BubbleObjects[bubble2]);
             // BubbleObjects.RemoveAt(bubble2);
             if (BubbleMergeList[MergeGroupIdx].Count < 2)
