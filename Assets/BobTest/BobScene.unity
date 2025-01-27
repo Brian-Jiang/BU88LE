@@ -422,6 +422,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1795291000}
     - target: {fileID: 4630764131537030211, guid: 3fd5ac9f53718934795eb3dee2b7eaf6, type: 3}
+      propertyPath: MergeSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4630764131537030211, guid: 3fd5ac9f53718934795eb3dee2b7eaf6, type: 3}
       propertyPath: GrowthSpeed
       value: 2
       objectReference: {fileID: 0}
