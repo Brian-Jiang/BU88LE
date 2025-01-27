@@ -8,17 +8,18 @@ public class ShowSimilarity : MonoBehaviour
     public GameObject loseUI;
     public float threshold;
 
-    private TextMeshPro similarityText;
+    private TextMeshProUGUI similarityText;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        similarityText = GetComponent<TextMeshPro>();
+        similarityText = GetComponent<TextMeshProUGUI>();
     }
 
 
-    bool CalculateSimilarity(float similarity)
+    public bool CalculateSimilarity(float similarity)
     {
+        similarity *= 100;
         similarityText.text = "Similarity: " + similarity.ToString("F2") + " %";
         if (similarity > threshold)
         {

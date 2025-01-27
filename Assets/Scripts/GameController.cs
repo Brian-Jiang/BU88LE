@@ -1,4 +1,4 @@
-﻿using Graphics;
+using Graphics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour
     public AudioManager audioManager;
     public ScreenshotCompareDirect screenshotCompareDirect;
     public SpawnSpheres bubbleSpawner;
+    public ShowSimilarity showSimilarity;
     
     private Material refImageMaterialInstance;
     private int lastSize = 0;
@@ -30,6 +31,16 @@ public class GameController : MonoBehaviour
         audioManager.Play("snapshot");
         var similarity = screenshotCompareDirect.CaptureAndCompare("ReferenceScreenshots/Level1.png");
         
+        if (showSimilarity.CalculateSimilarity(similarity))
+        {
+            audioManager.Play("pop");
+        }
+        else
+        {
+            audioManager.Play("lose");
+        }
+
+        // showSimilarity.CalculateSimilarity(bubbleRenderManager.CompareWithReference());
     }
 
     void ReloadLevel()
