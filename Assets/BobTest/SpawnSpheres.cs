@@ -8,7 +8,7 @@ public class SpawnSpheres : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     
-    public GameObject Bubble;
+    // public GameObject Bubble;
     public Camera MainCamera;
     public float GrowthSpeed = 2f;
     public float MinRadius = 1f;
@@ -17,7 +17,7 @@ public class SpawnSpheres : MonoBehaviour
     public float MergeThreshold = 0.1f;
     public List<(Vector3 center, float radius)> BubbleList = new();
     public List<List<int>> BubbleMergeList = new();
-    private List<GameObject> BubbleObjects = new();
+    // private List<GameObject> BubbleObjects = new();
     private List<float> ExRadius= new();
     
     public event Action OnAddBubble;
@@ -41,9 +41,9 @@ public class SpawnSpheres : MonoBehaviour
             mousePos.z = 0; 
             if (FindBubble(mousePos)==-1)
             {
-                GameObject newCircle = Instantiate(Bubble, mousePos, quaternion.identity);
-                newCircle.transform.localScale = Vector3.one * (MinRadius * 2);
-                BubbleObjects.Add(newCircle);
+                // GameObject newCircle = Instantiate(Bubble, mousePos, quaternion.identity);
+                // newCircle.transform.localScale = Vector3.one * (MinRadius * 2);
+                // BubbleObjects.Add(newCircle);
                 BubbleList.Add((mousePos, MinRadius));
                 ExRadius.Add(MinRadius);
                 OnAddBubble?.Invoke();
@@ -79,7 +79,7 @@ public class SpawnSpheres : MonoBehaviour
                 currBubble.radius += GrowthSpeed * Time.deltaTime;
                 BubbleList[i] = currBubble;
             }
-            FindBubbleObject(i);
+            // FindBubbleObject(i);
         }
             
         Debug.Log("MergeGroup Number:"+BubbleMergeList.Count);
@@ -108,11 +108,11 @@ public class SpawnSpheres : MonoBehaviour
     }
     
     //Find the bubble gameobject according to the center of the circle
-    void FindBubbleObject(int BubbleIndex)
-    {
-        BubbleObjects[BubbleIndex].transform.localScale = Vector3.one * BubbleList[BubbleIndex].radius * 2;
-        BubbleObjects[BubbleIndex].transform.position = BubbleList[BubbleIndex].center;
-    }
+    // void FindBubbleObject(int BubbleIndex)
+    // {
+    //     BubbleObjects[BubbleIndex].transform.localScale = Vector3.one * BubbleList[BubbleIndex].radius * 2;
+    //     BubbleObjects[BubbleIndex].transform.position = BubbleList[BubbleIndex].center;
+    // }
     
     void BubbleMerge()
     {
@@ -211,8 +211,8 @@ public class SpawnSpheres : MonoBehaviour
             BubbleList.RemoveAt(bubble2);
             ExRadius.RemoveAt(bubble2);
             OnRemoveBubble?.Invoke(bubble2);
-            Destroy(BubbleObjects[bubble2]);
-            BubbleObjects.RemoveAt(bubble2);
+            // Destroy(BubbleObjects[bubble2]);
+            // BubbleObjects.RemoveAt(bubble2);
             if (BubbleMergeList[MergeGroupIdx].Count < 2)
             {
                 BubbleMergeList.RemoveAt(MergeGroupIdx);

@@ -55,7 +55,7 @@ public class ScreenshotCompareDirect : MonoBehaviour
         // Destroy(referenceImage);
         Destroy(resizedReference);
 
-        return Mathf.Min(similarity * 8f, 100f);
+        return Mathf.Min(similarity * 8f, 1f);
     }
 
     Texture2D ResizeTexture(Texture2D source, int newWidth, int newHeight)

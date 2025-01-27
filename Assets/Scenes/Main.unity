@@ -435,7 +435,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   winUI: {fileID: 1491840536}
   loseUI: {fileID: 1951942924}
-  threshold: 70
+  threshold: 85
 --- !u!1 &600534894
 GameObject:
   m_ObjectHideFlags: 0
@@ -1209,10 +1209,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MainCamera: {fileID: 988833077}
-  GrowthSpeed: 0.05
-  MinRadius: 0.01
-  MaxRadius: 0.5
-  MergeSpeed: 2
+  GrowthSpeed: 0.3
+  MinRadius: 0.1
+  MaxRadius: 2
+  MergeSpeed: 1
   MergeThreshold: 0.1
 --- !u!4 &1483605272
 Transform:

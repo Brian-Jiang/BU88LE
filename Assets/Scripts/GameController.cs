@@ -77,7 +77,10 @@ public class GameController : MonoBehaviour
             var screenPos = camera.WorldToViewportPoint(bubbleList[i].center);
             screenPos.y = (screenPos.y - 0.5f) / camera.aspect + 0.5f;
             bubbleRenderManager.SetBubblePosition(i, screenPos);
-            bubbleRenderManager.SetBubbleSize(i, bubbleList[i].radius);
+            
+            var radius = bubbleList[i].radius;
+            radius /= camera.orthographicSize * 2;
+            bubbleRenderManager.SetBubbleSize(i, radius);
         }
     }
     
