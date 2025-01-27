@@ -15,11 +15,11 @@ public class ScreenshotCompareDirect : MonoBehaviour
         // }
     }
 
-    public float CaptureAndCompare(string referenceImagePath)
+    public float CaptureAndCompare(Texture2D referenceImage)
     {
         // yield return new WaitForEndOfFrame();
 
-        int scalingFactor = 5;
+        int scalingFactor = 50;
 
         // ��ͼ������
         //Texture2D screenshot = CaptureScreenshotToTexture();
@@ -29,19 +29,19 @@ public class ScreenshotCompareDirect : MonoBehaviour
         Texture2D screenshot = Capture3DView(quad);
         Texture2D resizedScreenshot = ResizeTexture(screenshot, scalingFactor, scalingFactor);
 
-        byte[] bytes = screenshot.EncodeToPNG();
-        System.IO.File.WriteAllBytes(Application.dataPath + "/Screenshots/screenshot.png", bytes);
-        Debug.Log("Quad Screenshot saved!");
+        // byte[] bytes = screenshot.EncodeToPNG();
+        // System.IO.File.WriteAllBytes(Application.dataPath + "/Screenshots/screenshot.png", bytes);
+        // Debug.Log("Quad Screenshot saved!");
 
         // ���زο�ͼƬ������
-        string fullReferencePath = Path.Combine(Application.dataPath, referenceImagePath);
-        if (!File.Exists(fullReferencePath))
-        {
-            Debug.LogError("�Ҳ����ο���ͼ: " + fullReferencePath);
-            return 0f;
-        }
+        // string fullReferencePath = Path.Combine(Application.dataPath, referenceImagePath);
+        // if (!File.Exists(fullReferencePath))
+        // {
+        //     Debug.LogError("�Ҳ����ο���ͼ: " + fullReferencePath);
+        //     return 0f;
+        // }
 
-        Texture2D referenceImage = LoadTexture(fullReferencePath);
+        // Texture2D referenceImage = LoadTexture(fullReferencePath);
         Texture2D resizedReference = ResizeTexture(referenceImage, scalingFactor, scalingFactor);
 
         // �������ƶȱȽ�
@@ -52,10 +52,10 @@ public class ScreenshotCompareDirect : MonoBehaviour
         // �ͷ�����
         Destroy(screenshot);
         Destroy(resizedScreenshot);
-        Destroy(referenceImage);
+        // Destroy(referenceImage);
         Destroy(resizedReference);
 
-        return similarity;
+        return Mathf.Min(similarity * 8f, 100f);
     }
 
     Texture2D ResizeTexture(Texture2D source, int newWidth, int newHeight)

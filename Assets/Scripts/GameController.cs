@@ -29,7 +29,7 @@ public class GameController : MonoBehaviour
     {
         // bubbleRenderManager.Snapshot();
         audioManager.Play("snapshot");
-        var similarity = screenshotCompareDirect.CaptureAndCompare("ReferenceScreenshots/Level1.png");
+        var similarity = screenshotCompareDirect.CaptureAndCompare(refImageMaterialInstance.GetTexture("_BaseMap") as Texture2D);
         
         if (showSimilarity.CalculateSimilarity(similarity))
         {
