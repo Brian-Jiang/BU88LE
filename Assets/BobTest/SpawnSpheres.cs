@@ -122,13 +122,11 @@ public class SpawnSpheres : MonoBehaviour
                         if (BubbleMergeList[MergeGroupIdx].Contains(i))
                         {
                             GroupI = MergeGroupIdx;
-                            break;
                         }
                         
                         if(BubbleMergeList[MergeGroupIdx].Contains(j))
                         {
                             GroupJ = MergeGroupIdx;
-                            break;
                         }
                     }
 
