@@ -61,12 +61,8 @@ public class SpawnSpheres : MonoBehaviour
             int currCenterIndex = FindBubble(mousePos);
             if (currCenterIndex != -1 && BubbleList[currCenterIndex].radius < MaxRadius)
             {
-                //var bubble = BubbleList[currCenterIndex];
                 ExRadius[currCenterIndex] += GrowthSpeed * Time.deltaTime;
-                //BubbleList[currCenterIndex] = bubble;
-                //Debug.Log("Radius:"+bubble.radius);
                 
-                //FindBubbleObject(currCenterIndex);
             }
             
         }
@@ -130,7 +126,6 @@ public class SpawnSpheres : MonoBehaviour
                 if (distance <= radiusSum)
                 {
                     // check if bubble i and bubble j in BubbleMergeList
-                    bool ConMerged = true;
                     int MergeGroupIdx;
                     int GroupI=-1, GroupJ=-1;
                     for (MergeGroupIdx = 0; MergeGroupIdx < BubbleMergeList.Count; MergeGroupIdx++)
@@ -214,6 +209,7 @@ public class SpawnSpheres : MonoBehaviour
         {
             BubbleMergeList[MergeGroupIdx].Remove(bubble2);
             BubbleList.RemoveAt(bubble2);
+            ExRadius.RemoveAt(bubble2);
             OnRemoveBubble?.Invoke(bubble2);
             Destroy(BubbleObjects[bubble2]);
             BubbleObjects.RemoveAt(bubble2);
